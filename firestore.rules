@@ -1,0 +1,58 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default deny all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128;
+    }
+
+    function isCourseOwner(courseId) {
+      return isSignedIn() &&
+        exists(/databases/$(database)/documents/courses/$(courseId)) &&
+        get(/databases/$(database)/documents/courses/$(courseId)).data.teacherId == request.auth.uid;
+    }
+
+    // Courses collection
+    match /courses/{courseId} {
+      allow get: if isSignedIn() && (resource == null || resource.data.teacherId == request.auth.uid);
+      allow list: if isSignedIn() && resource.data.teacherId == request.auth.uid;
+      allow create: if isSignedIn() && isValidId(courseId) &&
+        request.resource.data.teacherId == request.auth.uid &&
+        request.resource.data.code is string && request.resource.data.code.size() <= 30 &&
+        request.resource.data.name is string && request.resource.data.name.size() <= 200;
+      allow update: if isSignedIn() && resource.data.teacherId == request.auth.uid &&
+        request.resource.data.teacherId == resource.data.teacherId;
+      allow delete: if isSignedIn() && resource.data.teacherId == request.auth.uid;
+
+      // Students subcollection
+      match /students/{studentId} {
+        allow read, write: if isCourseOwner(courseId);
+      }
+
+      // Sessions subcollection
+      match /sessions/{sessionId} {
+        allow read, write: if isCourseOwner(courseId);
+
+        // Attendance records subcollection
+        match /records/{recordId} {
+          allow read, write: if isCourseOwner(courseId);
+        }
+      }
+    }
+
+    // Test connection doc for initial boot check
+    match /test/connection {
+      allow read: if true;
+    }
+  }
+}

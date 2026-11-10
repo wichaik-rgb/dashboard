@@ -1,0 +1,93 @@
+{
+  "entities": {
+    "Course": {
+      "title": "Course",
+      "description": "A course subject taught by the instructor",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "code": { "type": "string", "maxLength": 30 },
+        "name": { "type": "string", "maxLength": 200 },
+        "section": { "type": "string", "maxLength": 50 },
+        "semester": { "type": "string", "maxLength": 50 },
+        "teacherId": { "type": "string", "maxLength": 128 },
+        "teacherEmail": { "type": "string", "maxLength": 200 },
+        "totalWeeks": { "type": "number" },
+        "createdAt": { "type": "string", "maxLength": 64 },
+        "updatedAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["id", "code", "name", "teacherId", "createdAt"]
+    },
+    "Student": {
+      "title": "Student",
+      "description": "A student enrolled in a course",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "studentCode": { "type": "string", "maxLength": 30 },
+        "name": { "type": "string", "maxLength": 150 },
+        "nickname": { "type": "string", "maxLength": 50 },
+        "email": { "type": "string", "maxLength": 150 },
+        "phone": { "type": "string", "maxLength": 50 },
+        "note": { "type": "string", "maxLength": 300 },
+        "createdAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["id", "studentCode", "name", "createdAt"]
+    },
+    "Session": {
+      "title": "Session",
+      "description": "An attendance and class session for a specific week or date",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "weekNumber": { "type": "number" },
+        "sessionDate": { "type": "string", "maxLength": 30 },
+        "title": { "type": "string", "maxLength": 200 },
+        "notes": { "type": "string", "maxLength": 500 },
+        "status": { "type": "string", "enum": ["open", "completed"] },
+        "presentCount": { "type": "number" },
+        "absentCount": { "type": "number" },
+        "leaveCount": { "type": "number" },
+        "lateCount": { "type": "number" },
+        "avgParticipation": { "type": "number" },
+        "createdAt": { "type": "string", "maxLength": 64 },
+        "updatedAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["id", "weekNumber", "sessionDate", "createdAt"]
+    },
+    "AttendanceRecord": {
+      "title": "AttendanceRecord",
+      "description": "An individual student attendance and participation record in a session",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "studentId": { "type": "string", "maxLength": 128 },
+        "studentCode": { "type": "string", "maxLength": 30 },
+        "studentName": { "type": "string", "maxLength": 150 },
+        "status": { "type": "string", "enum": ["present", "absent", "leave", "late"] },
+        "score": { "type": "number" },
+        "note": { "type": "string", "maxLength": 300 },
+        "updatedAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["id", "studentId", "status", "score"]
+    }
+  },
+  "firestore": {
+    "/courses/{courseId}": {
+      "schema": { "$ref": "#/entities/Course" },
+      "description": "Collection of courses taught by instructors"
+    },
+    "/courses/{courseId}/students/{studentId}": {
+      "schema": { "$ref": "#/entities/Student" },
+      "description": "Students enrolled in the course"
+    },
+    "/courses/{courseId}/sessions/{sessionId}": {
+      "schema": { "$ref": "#/entities/Session" },
+      "description": "Weekly class sessions and attendance periods"
+    },
+    "/courses/{courseId}/sessions/{sessionId}/records/{recordId}": {
+      "schema": { "$ref": "#/entities/AttendanceRecord" },
+      "description": "Individual attendance status and participation score"
+    }
+  }
+}

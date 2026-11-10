@@ -1,0 +1,6 @@
+{
+  "name": "ClassPulse - เช็กชื่อ & การมีส่วนร่วม",
+  "description": "ระบบเช็กชื่อเข้าเรียน บันทึกคะแนนการมีส่วนร่วม และวิเคราะห์แนวโน้มการเข้าเรียนสำหรับอาจารย์ผู้สอน",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
